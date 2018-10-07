@@ -4,7 +4,7 @@ import tensorflow as tf
 from cnn import CNN
 from flatten_network import flatten
 from fully_connected_layer import create_fully_connected_layer
-from read_data import split_dataset_with_ratio
+from batch_dataset import BatchDataset
 IMAGE_HEIGHT = 256
 IMAGE_WIDTH = 256
 FILTERS = 3
@@ -30,26 +30,44 @@ layer_fully_connected = create_fully_connected_layer(input=layer_flat,no_of_inpu
 print(layer_fully_connected)
 
 cost_function = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits= layer_fully_connected, labels= output_true))
-optimizer = tf.train.AdamOptimizer(learning_rate=0.001).minimize(cost_function)
+optimizer = tf.train.GradientDescentOptimizer(learning_rate=0.01).minimize(cost_function)
 
 init = tf.global_variables_initializer()
 sess = tf.Session()
 sess.run(init)
 
-data_train, labels_train, data_test, labels_test = split_dataset_with_ratio(0.20)
+batchDataset = BatchDataset(0.30)
 print "dataset content details:"
-print len(data_train), len(labels_train), len(data_test), len(labels_test)
+batchDataset.get_details()
+
+# for each_epoch in range(EPOCHS):
+#     sess.run(optimizer, feed_dict={input: data_train, output_true: labels_train})
+#     cost = sess.run(cost_function,feed_dict={input:data_train, output_true:labels_train})
+#     correct_predictions = tf.equal(tf.argmax(layer_fully_connected,1),tf.argmax(output_true,1))
+#     accuracy = tf.reduce_mean(tf.cast(correct_predictions, tf.float32))
+#     pred_outputs = sess.run(layer_fully_connected,{input:data_test})
+#     mean_square_error = tf.reduce_mean(tf.square(pred_outputs - labels_test))
+#     mean_square_error_value = sess.run(mean_square_error)
+#     accuracy_value = sess.run(accuracy, {input: data_test, output_true: labels_test})
+#     print "epoch number : "+ str(each_epoch) + " - cost : "+ str(cost)+ " - mse : "+ str(mean_square_error_value)+" - accuracy : "+str(accuracy_value)
+
 
 for each_epoch in range(EPOCHS):
-    sess.run(optimizer, feed_dict={input: data_train, output_true: labels_train})
-    cost = sess.run(cost_function,feed_dict={input:data_train, output_true:labels_train})
-    correct_predictions = tf.equal(tf.argmax(layer_fully_connected,1),tf.argmax(output_true,1))
-    accuracy = tf.reduce_mean(tf.cast(correct_predictions, tf.float32))
-    pred_outputs = sess.run(layer_fully_connected,{input:data_test})
-    mean_square_error = tf.reduce_mean(tf.square(pred_outputs - labels_test))
-    mean_square_error_value = sess.run(mean_square_error)
-    accuracy_value = sess.run(accuracy, {input: data_test, output_true: labels_test})
-    print "epoch number : "+ str(each_epoch) + " - cost : "+ str(cost)+ " - mse : "+ str(mean_square_error_value)+" - accuracy : "+str(accuracy_value)
+    batchDataset.data_present = True
+    batchDataset.counter = 0
+    data_test, labels_test = batchDataset.get_test_data()
+    while(batchDataset.data_present):
+        data_train, labels_train = batchDataset.get_next()
+        sess.run(optimizer, feed_dict={input: data_train, output_true: labels_train})
+        cost = sess.run(cost_function,feed_dict={input:data_train, output_true:labels_train})
+        correct_predictions = tf.equal(tf.argmax(layer_fully_connected,1),tf.argmax(output_true,1))
+        accuracy = tf.reduce_mean(tf.cast(correct_predictions, tf.float32))
+        pred_outputs = sess.run(layer_fully_connected,{input:data_test})
+        mean_square_error = tf.reduce_mean(tf.square(pred_outputs - labels_test))
+        mean_square_error_value = sess.run(mean_square_error)
+        accuracy_value = sess.run(accuracy, {input: data_test, output_true: labels_test})
+        print "epoch number : "+ str(each_epoch) + " - cost : "+ str(cost)+ " - mse : "+ str(mean_square_error_value)+" - accuracy : "+str(accuracy_value)
+
 
 saver = tf.train.Saver()
 save_path = saver.save(sess, "/home/sekhar/EXTRAS/tensorflow-basics/Flower-Dataset")
