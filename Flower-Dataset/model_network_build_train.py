@@ -9,7 +9,7 @@ IMAGE_HEIGHT = 256
 IMAGE_WIDTH = 256
 FILTERS = 3
 NO_OF_FLOWERS = 5
-EPOCHS = 500
+EPOCHS = 50
 
 
 input = tf.placeholder(tf.float32, shape=[None, IMAGE_HEIGHT,IMAGE_WIDTH,FILTERS])
@@ -30,13 +30,13 @@ layer_fully_connected = create_fully_connected_layer(input=layer_flat,no_of_inpu
 print(layer_fully_connected)
 
 cost_function = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits= layer_fully_connected, labels= output_true))
-optimizer = tf.train.GradientDescentOptimizer(learning_rate=0.01).minimize(cost_function)
+optimizer = tf.train.AdamOptimizer(learning_rate=0.01).minimize(cost_function)
 
 init = tf.global_variables_initializer()
 sess = tf.Session()
 sess.run(init)
 
-batchDataset = BatchDataset(0.30)
+batchDataset = BatchDataset(0.30,4)
 print "dataset content details:"
 batchDataset.get_details()
 
@@ -58,6 +58,7 @@ for each_epoch in range(EPOCHS):
     data_test, labels_test = batchDataset.get_test_data()
     while(batchDataset.data_present):
         data_train, labels_train = batchDataset.get_next()
+        print (data_train,labels_train)
         sess.run(optimizer, feed_dict={input: data_train, output_true: labels_train})
         cost = sess.run(cost_function,feed_dict={input:data_train, output_true:labels_train})
         correct_predictions = tf.equal(tf.argmax(layer_fully_connected,1),tf.argmax(output_true,1))
@@ -66,7 +67,7 @@ for each_epoch in range(EPOCHS):
         mean_square_error = tf.reduce_mean(tf.square(pred_outputs - labels_test))
         mean_square_error_value = sess.run(mean_square_error)
         accuracy_value = sess.run(accuracy, {input: data_test, output_true: labels_test})
-        print "epoch number : "+ str(each_epoch) + " - cost : "+ str(cost)+ " - mse : "+ str(mean_square_error_value)+" - accuracy : "+str(accuracy_value)
+        print "epoch number : "+ str(each_epoch) + " - cost : "+ str(cost)+" - mse : "+str(mean_square_error_value)+" - accuracy : "+str(accuracy_value)
 
 
 saver = tf.train.Saver()

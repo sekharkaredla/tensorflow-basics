@@ -12,6 +12,7 @@ def one_hot_encode(labels):
     n_unique_labels = len(np.unique(labels))
     one_hot_encode = np.zeros((n_labels,n_unique_labels))
     one_hot_encode[range(n_labels),labels] = 1
+    one_hot_encode.astype(float)
     return one_hot_encode
 
 def split_dataset_with_ratio(ratio):
@@ -20,6 +21,7 @@ def split_dataset_with_ratio(ratio):
     flower_data_folder = "/home/sekhar/EXTRAS/flowers-recognition/flowers_reshaped/"
     for each_flower_image in glob.glob(flower_data_folder+"*.jpg"):
         image_data = cv2.imread(each_flower_image)
+        image_data = image_data.astype(float)
         image_label = each_flower_image.split('/')[-1].split('_')[0]
         data.append(image_data)
         labels.append(image_label)

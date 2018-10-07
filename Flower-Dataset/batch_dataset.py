@@ -1,7 +1,7 @@
 from read_data import split_dataset_with_ratio
 
 class BatchDataset:
-    def __init__(self,ratio):
+    def __init__(self,ratio,batch_size):
         data = split_dataset_with_ratio(ratio)
         self.data_train = data[0]
         self.labels_train = data[1]
@@ -9,11 +9,12 @@ class BatchDataset:
         self.labels_test = data[3]
         self.counter = 0
         self.data_present = True
+        self.batch_size = batch_size
 
     def get_next(self):
-        if self.counter+20<len(self.data_train):
-            return (self.data_train[self.counter:self.counter+20],self.labels_train[self.counter:self.counter+20])
-            self.counter += 20
+        if self.counter+self.batch_size<len(self.data_train):
+            return (self.data_train[self.counter:self.counter+self.batch_size],self.labels_train[self.counter:self.counter+self.batch_size])
+            self.counter += self.batch_size
         else:
             self.data_present = False
             return (self.data_train[self.counter:],self.labels_train[self.counter:])
