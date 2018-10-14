@@ -13,8 +13,8 @@ class BatchDataset:
 
     def get_next(self):
         if self.counter+self.batch_size<len(self.data_train):
-            return (self.data_train[self.counter:self.counter+self.batch_size],self.labels_train[self.counter:self.counter+self.batch_size])
             self.counter += self.batch_size
+            return (self.data_train[self.counter:self.counter+self.batch_size],self.labels_train[self.counter:self.counter+self.batch_size])
         else:
             self.data_present = False
             return (self.data_train[self.counter:],self.labels_train[self.counter:])

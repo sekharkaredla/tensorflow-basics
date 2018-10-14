@@ -12,7 +12,7 @@ NO_OF_FLOWERS = 5
 EPOCHS = 50
 
 
-input = tf.placeholder(tf.float32, shape=[None, IMAGE_HEIGHT,IMAGE_WIDTH,FILTERS])
+input = tf.placeholder(tf.float32, shape=[None, IMAGE_HEIGHT,IMAGE_WIDTH])
 output_true = tf.placeholder(tf.float32, shape=[None, NO_OF_FLOWERS])
 
 
@@ -68,7 +68,6 @@ for each_epoch in range(EPOCHS):
         mean_square_error_value = sess.run(mean_square_error)
         accuracy_value = sess.run(accuracy, {input: data_test, output_true: labels_test})
         print "epoch number : "+ str(each_epoch) + " - cost : "+ str(cost)+" - mse : "+str(mean_square_error_value)+" - accuracy : "+str(accuracy_value)
-
 
 saver = tf.train.Saver()
 save_path = saver.save(sess, "/home/sekhar/EXTRAS/tensorflow-basics/Flower-Dataset")

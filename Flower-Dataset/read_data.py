@@ -18,11 +18,14 @@ def one_hot_encode(labels):
 def split_dataset_with_ratio(ratio):
     data = []
     labels = []
-    flower_data_folder = "/home/sekhar/EXTRAS/flowers-recognition/flowers_reshaped/"
+    flower_data_folder = "/Users/roshni/Documents/CODE/flowers_dataset/reshaped/"
     for each_flower_image in glob.glob(flower_data_folder+"*.jpg"):
         image_data = cv2.imread(each_flower_image)
         image_data = image_data.astype(float)
         image_label = each_flower_image.split('/')[-1].split('_')[0]
+
+        image_data = (image_data - image_data.min())/(image_data.max() - image_data.min())
+        image_data = image_data.reshape(-1,1)
         data.append(image_data)
         labels.append(image_label)
         print image_label
