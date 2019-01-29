@@ -29,5 +29,5 @@ with tf.Session() as sess:
     outputs_val = outputs.eval(feed_dict={X: X_batch}) # evaluates outputs (values of hidden layers) in each step. Output dimensions are [batch_size, max_time, cell.output_size]
     states_val = states.eval(feed_dict={X: X_batch}) # Returns the final state of the network. Output dimensions are [batch_size, cell.state_size]
 
-print(outputs_val)
-print(states_val)
+print(outputs_val,outputs_val.shape)
+print(states_val,states_val.shape)
