@@ -19,6 +19,8 @@ batch_size = 10
 no_of_timesteps = 60
 no_of_inputs = 7
 no_of_outputs = 2
+no_of_hidden_layer_cells = 30
+no_of_layers = 2
 # X_new = np.empty(shape=[batch_size,no_of_timesteps,no_of_inputs],dtype=np.float64)
 # def arrange_data(no_of_inputs,no_of_timesteps,batch_size):
 #     batch_array = np.empty(shape=[no_of_timesteps,no_of_inputs],dtype=np.float64)
@@ -59,3 +61,17 @@ print(X_new,Y_new,len(X_new),len(Y_new))
 print(X_new[-1].shape) #according to data should return (24,7)  52 * 50 + 24 = 2624(data size)
 
 
+data_to_model = tf.placeholder(tf.float32,[None,None,no_of_inputs])
+print(data_to_model)
+
+basic_LSTM_cell = tf.nn.rnn_cell.LSTMCell(no_of_hidden_layer_cells)
+
+multilayer_cell = [tf.nn.rnn_cell.LSTMCell(no_of_hidden_layer_cells) for _ in range(no_of_layers)]
+
+lstm_cell = tf.nn.rnn_cell.MultiRNNCell(multilayer_cell)
+
+init_state = lstm_cell.zero_state(batch_size, tf.float32)
+
+rnn_outputs, final_state = tf.nn.dynamic_rnn(lstm_cell, data_to_model, initial_state=init_state)
+
+print(rnn_outputs,final_state)
